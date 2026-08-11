@@ -7,7 +7,7 @@
   "Author": "Adfnitum",
   "Version": "1.0.9",
   "Language": "csharp",
-  "Website": "",
+  "Website": "https://github.com/LaShonkilla/Flow.Launcher.Plugin.QuickUninstall",
   "IcoPath": "icon.png",
   "ExecuteFileName": "Flow.Launcher.Plugin.QuickUninstall.dll"
 }
