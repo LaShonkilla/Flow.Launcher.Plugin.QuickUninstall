@@ -1,6 +1,6 @@
 # Quick Uninstall
 
-A minimal Flow Launcher plugin for uninstalling classic Windows programs, Microsoft Store/MSIX apps, and Steam games.
+A minimal Flow Launcher plugin for uninstalling classic Windows programs, Microsoft Store/MSIX apps, and Games.
 
 ## Usage
 
@@ -10,9 +10,10 @@ A minimal Flow Launcher plugin for uninstalling classic Windows programs, Micros
 - `un -date` — oldest date → newest date
 - `un size` — largest → smallest
 - `un -size` — smallest → largest
+- `un stat` — Statistic for Disk Usage and Number of Installed apps 
 - Add search text after a sort command, e.g. `un size chrome` or `un date steam`.
 
-Press Enter or Right Arrow on an app to open the same in-Flow confirmation menu. No is the first/default option and returns to the same result list; Yes starts the native uninstaller.
+Press Enter or Right Arrow on an app to open the same in-Flow confirmation menu.
 
 ## Install
 
