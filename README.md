@@ -19,6 +19,7 @@ A minimal Flow Launcher plugin for uninstalling classic Windows programs, Micros
 Press Enter or Right Arrow on an app to open the same in-Flow confirmation menu.
 
 No - Return to the list
+
 Yes - Start native uninstaller
 
 ![Quick Uninstall demo](Showcase2.gif)
