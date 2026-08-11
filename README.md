@@ -22,6 +22,7 @@ No - Return to the list
 
 Yes - Start native uninstaller
 
+
 ![Quick Uninstall demo](Showcase2.gif)
 
 ## Install
