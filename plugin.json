@@ -1,0 +1,13 @@
+{
+  "$schema": "https://www.flowlauncher.com/schemas/plugin.schema.json",
+  "ID": "9d4837b0-4c77-4d0d-b7ad-9879b2bd907e",
+  "ActionKeyword": "un",
+  "Name": "Quick Uninstall",
+  "Description": "Fast native uninstall for programs, apps and Steam games with sorting, statistics and in-Flow confirmation.",
+  "Author": "Adfnitum",
+  "Version": "1.0.9",
+  "Language": "csharp",
+  "Website": "",
+  "IcoPath": "icon.png",
+  "ExecuteFileName": "Flow.Launcher.Plugin.QuickUninstall.dll"
+}

@@ -1,0 +1,92 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\LaShone's PC\\Desktop\\QuickUninstall-source-v1.0.9\\QuickUninstall\\Flow.Launcher.Plugin.QuickUninstall.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\LaShone's PC\\Desktop\\QuickUninstall-source-v1.0.9\\QuickUninstall\\Flow.Launcher.Plugin.QuickUninstall.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\LaShone's PC\\Desktop\\QuickUninstall-source-v1.0.9\\QuickUninstall\\Flow.Launcher.Plugin.QuickUninstall.csproj",
+        "projectName": "Flow.Launcher.Plugin.QuickUninstall",
+        "projectPath": "C:\\Users\\LaShone's PC\\Desktop\\QuickUninstall-source-v1.0.9\\QuickUninstall\\Flow.Launcher.Plugin.QuickUninstall.csproj",
+        "packagesPath": "C:\\Users\\LaShone's PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\LaShone's PC\\Desktop\\QuickUninstall-source-v1.0.9\\QuickUninstall\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\LaShone's PC\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0-windows"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0-windows": {
+            "framework": "net7.0-windows7.0",
+            "targetAlias": "net7.0-windows",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net7.0-windows": {
+          "framework": "net7.0-windows7.0",
+          "targetAlias": "net7.0-windows",
+          "dependencies": {
+            "Flow.Launcher.Plugin": {
+              "target": "Package",
+              "version": "[4.4.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
