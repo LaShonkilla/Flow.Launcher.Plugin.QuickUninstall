@@ -1,0 +1,42 @@
+name: Publish Release
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - .github/workflows/*
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Get version
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: 'plugin.json'
+          prop_path: 'Version'
+
+      - name: Build
+        run: |
+          dotnet publish 'Flow.Launcher.Plugin.QuickUninstall.csproj' -r win-x64 -c Release -o "QuickUninstall-${{ steps.version.outputs.prop }}"
+          7z a -tzip "QuickUninstall-${{ steps.version.outputs.prop }}.zip" "./QuickUninstall-${{ steps.version.outputs.prop }}/*"
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "QuickUninstall-${{ steps.version.outputs.prop }}.zip"
+          tag_name: "v${{ steps.version.outputs.prop }}"
