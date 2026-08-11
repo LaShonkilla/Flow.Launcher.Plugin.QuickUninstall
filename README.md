@@ -13,6 +13,8 @@ A minimal Flow Launcher plugin for uninstalling classic Windows programs, Micros
 - `un stat` — Statistic for Disk Usage and Number of Installed apps 
 - Add search text after a sort command, e.g. `un size chrome` or `un date steam`.
 
+![Quick Uninstall demo](Showcase.gif)
+
 Press Enter or Right Arrow on an app to open the same in-Flow confirmation menu.
 
 ## Install
