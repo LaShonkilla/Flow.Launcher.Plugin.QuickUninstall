@@ -1,8 +1,7 @@
 # Quick Uninstall
 
-A minimal Flow Launcher plugin for uninstalling classic Windows programs, Microsoft Store/MSIX apps, and Games.
-- No waiting just uninstall quick and simple.
-
+A minimal Flow Launcher plugin for uninstalling classic Windows programs, Microsoft Store/MSIX apps, and Games from any source.
+- Easily Find Unnecessary Apps. No waiting just uninstall quick and simple.
 ## Usage
 
 - `un` — list all apps, sorted A → Z
