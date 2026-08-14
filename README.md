@@ -26,3 +26,5 @@ Yes - Start native uninstaller
 ![Quick Uninstall demo](Showcase2.gif)
 
 ## Install
+
+Run `build-and-install.ps1`, then restart Flow Launcher.
