@@ -17,6 +17,11 @@ public sealed class Main : IAsyncPlugin, IContextMenu
     private const byte VkRight = 0x27;
     private const uint KeyEventKeyUp = 0x0002;
 
+    // Stale-while-revalidate: queries always use the current in-memory catalog immediately.
+    // A refresh may start in the background, but QueryAsync never waits for it.
+    private static readonly TimeSpan ActivationRefreshDebounce = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan MaximumCacheAge = TimeSpan.FromSeconds(30);
+
     private enum SortMode
     {
         Default,
@@ -35,6 +40,9 @@ public sealed class Main : IAsyncPlugin, IContextMenu
     private PluginInitContext _context = null!;
     private IReadOnlyList<InstalledApp> _apps = Array.Empty<InstalledApp>();
     private bool _loaded;
+    private DateTime _lastRefreshUtc = DateTime.MinValue;
+    private DateTime _lastRefreshRequestUtc = DateTime.MinValue;
+    private int _backgroundRefreshRunning;
 
     [DllImport("user32.dll")]
     private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -43,14 +51,16 @@ public sealed class Main : IAsyncPlugin, IContextMenu
     {
         _context = context;
         await RefreshAsync(CancellationToken.None);
+        _lastRefreshRequestUtc = _lastRefreshUtc;
     }
 
     public async Task<List<Result>> QueryAsync(Query query, CancellationToken token)
     {
-        if (!_loaded)
-            await RefreshAsync(token);
-
         var rawSearch = query.Search?.Trim() ?? string.Empty;
+
+        // Never block the visible query on indexing. Show the current cache immediately,
+        // while a stale-while-revalidate refresh runs independently in the background.
+        ScheduleBackgroundRefresh(rawSearch);
 
         // Dedicated statistics view.
         if (rawSearch.Equals("stat", StringComparison.OrdinalIgnoreCase))
@@ -290,17 +300,126 @@ public sealed class Main : IAsyncPlugin, IContextMenu
         }
     }
 
-    private async Task RefreshAsync(CancellationToken cancellationToken)
+    private void ScheduleBackgroundRefresh(string rawSearch)
+    {
+        if (!_loaded)
+            return;
+
+        var now = DateTime.UtcNow;
+        var catalogAge = now - _lastRefreshUtc;
+        var sinceLastRequest = now - _lastRefreshRequestUtc;
+
+        // A bare `un` is treated as opening the plugin. Direct/history searches also refresh
+        // after the cache has aged, but none of these refreshes block QueryAsync.
+        var shouldRefresh =
+            (string.IsNullOrWhiteSpace(rawSearch) && sinceLastRequest >= ActivationRefreshDebounce)
+            || catalogAge >= MaximumCacheAge;
+
+        if (!shouldRefresh)
+            return;
+
+        // Record the request before checking the worker so repeated QueryAsync calls do not
+        // continuously queue refreshes while the same background scan is still running.
+        _lastRefreshRequestUtc = now;
+
+        if (Interlocked.CompareExchange(ref _backgroundRefreshRunning, 1, 0) != 0)
+            return;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var changed = await RefreshAsync(CancellationToken.None);
+
+                if (changed)
+                    TryRequeryCurrentView();
+            }
+            catch
+            {
+                // Background refresh is best-effort. Keep serving the last known-good cache.
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _backgroundRefreshRunning, 0);
+            }
+        });
+    }
+
+    private async Task<bool> RefreshAsync(CancellationToken cancellationToken)
     {
         await _refreshLock.WaitAsync(cancellationToken);
         try
         {
-            _apps = await _catalog.LoadAsync(cancellationToken);
+            var refreshedApps = await _catalog.LoadAsync(cancellationToken);
+            var changed = _loaded && !CatalogsAreEquivalent(_apps, refreshedApps);
+
+            _apps = refreshedApps;
             _loaded = true;
+            _lastRefreshUtc = DateTime.UtcNow;
+
+            return changed;
         }
         finally
         {
             _refreshLock.Release();
+        }
+    }
+
+    private static bool CatalogsAreEquivalent(
+        IReadOnlyList<InstalledApp> current,
+        IReadOnlyList<InstalledApp> refreshed)
+    {
+        if (current.Count != refreshed.Count)
+            return false;
+
+        // Compare stable uninstall identities rather than list order. This catches installs,
+        // removals and package changes without refreshing the UI for harmless metadata changes.
+        var currentIds = current.Select(GetCatalogIdentity)
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
+        var refreshedIds = refreshed.Select(GetCatalogIdentity)
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
+
+        return currentIds.SequenceEqual(refreshedIds, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static string GetCatalogIdentity(InstalledApp app)
+    {
+        var nativeId = app.Source switch
+        {
+            AppSource.Steam => app.SteamAppId,
+            AppSource.Store => app.PackageFullName,
+            AppSource.Program => app.RegistryKeyName ?? app.UninstallCommand,
+            _ => null
+        };
+
+        return $"{app.Source}|{app.Name}|{nativeId}";
+    }
+
+    private void TryRequeryCurrentView()
+    {
+        try
+        {
+            // Newer Flow versions expose ReQuery(bool reselect). Use reflection so the plugin
+            // remains build-compatible with the existing Flow.Launcher.Plugin 4.4.0 reference.
+            // ReQuery keeps whatever the user is currently typing, unlike writing an old query
+            // back with ChangeQuery.
+            var api = _context.API;
+            var apiType = api.GetType();
+
+            var withReselect = apiType.GetMethod("ReQuery", new[] { typeof(bool) });
+            if (withReselect != null)
+            {
+                withReselect.Invoke(api, new object[] { false });
+                return;
+            }
+
+            var parameterless = apiType.GetMethod("ReQuery", Type.EmptyTypes);
+            parameterless?.Invoke(api, null);
+        }
+        catch
+        {
+            // On older Flow versions the refreshed cache will simply be visible on the next
+            // keystroke/query. Never overwrite the user's current text as a fallback.
         }
     }
 

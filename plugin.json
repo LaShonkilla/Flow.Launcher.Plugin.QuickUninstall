@@ -5,7 +5,7 @@
   "Name": "Quick Uninstall",
   "Description": "Fast native uninstall for programs, apps and Steam games with sorting, statistics and in-Flow confirmation.",
   "Author": "Adfnitum",
-  "Version": "1.0.9",
+  "Version": "1.1.1",
   "Language": "csharp",
   "Website": "https://github.com/LaShonkilla/Flow.Launcher.Plugin.QuickUninstall",
   "IcoPath": "icon.png",

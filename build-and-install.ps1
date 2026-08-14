@@ -3,12 +3,19 @@ $ErrorActionPreference = 'Stop'
 Write-Host "Building Quick Uninstall..." -ForegroundColor Cyan
 
 dotnet restore
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet restore failed with exit code $LASTEXITCODE"
+}
+
 # Official Flow template currently targets net7.0-windows.
 dotnet build -c Release
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet build failed with exit code $LASTEXITCODE"
+}
 
 $source = Join-Path $PSScriptRoot 'bin\Release'
 $pluginRoot = Join-Path $env:APPDATA 'FlowLauncher\Plugins'
-$target = Join-Path $pluginRoot 'QuickUninstall-1.0.9'
+$target = Join-Path $pluginRoot 'QuickUninstall-1.1.1'
 
 if (!(Test-Path $source)) {
     throw "Build output not found: $source"
